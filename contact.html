@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact — TrendHijacking</title>
+  <meta name="description" content="Book a free consultation or submit your acquisition criteria.">
+  <link rel="icon" href="assets/logo/th-favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=Geist:wght@400;500;600&family=Fragment+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="contact">
+<header id="nav"></header>
+
+<main>
+  <section class="page-head" style="padding-bottom:0">
+    <div class="wrap contact-grid">
+      <div>
+        <span class="eyebrow">Contact</span>
+        <h1 class="d1" data-split style="font-size:clamp(2.6rem,5.6vw,5.4rem)">Let's find your next <em>business.</em></h1>
+        <p class="lead" data-reveal>Book a free consultation, submit your acquisition criteria, or ask us to review a deal you've already found.</p>
+        <div class="cinfo" data-stagger>
+          <a class="sq-sm" href="mailto:support@trendhijacking.com"><span>Email</span><b>support@trendhijacking.com</b></a>
+          <a class="sq-sm" href="tel:+442032877320"><span>UK</span><b>+44 20 3287 7320</b></a>
+          <a class="sq-sm" href="tel:+12136323209"><span>US</span><b>+1 213 632 3209</b></a>
+          <div class="sq-sm"><span>Offices</span><b style="text-align:right">Mildenhall, UK · St. Petersburg, FL</b></div>
+        </div>
+      </div>
+
+      <form class="form sq" data-reveal>
+        <div class="field">
+          <label>I'm interested in</label>
+          <div class="seg">
+            <input type="radio" name="t" id="t1" checked><label for="t1">Smart Acquisition</label>
+            <input type="radio" name="t" id="t2"><label for="t2">Acquisition Partnership</label>
+            <input type="radio" name="t" id="t3"><label for="t3">Due diligence</label>
+            <input type="radio" name="t" id="t4"><label for="t4">Selling my business</label>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="n">Full name</label><input id="n" required placeholder="Jane Smith"></div>
+          <div class="field"><label for="e">Email</label><input id="e" type="email" required placeholder="jane@email.com"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="c">Available capital</label>
+            <select id="c"><option>Under $100K</option><option selected>$100K – $200K</option><option>$200K – $500K</option><option>$500K+</option></select></div>
+          <div class="field"><label for="ph">Phone (optional)</label><input id="ph" type="tel" placeholder="+44 …"></div>
+        </div>
+        <div class="field"><label for="m">What are you looking for?</label><textarea id="m" placeholder="Niche, budget, how involved you want to be…"></textarea></div>
+        <button class="btn btn-green" type="submit" style="justify-self:start">Send enquiry<span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8h9.5M8.5 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        <p class="form-ok">Thanks — we'll be in touch within one business day.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer id="foot"></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

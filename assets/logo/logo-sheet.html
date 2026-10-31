@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrendHijacking Logo</title>
+<link rel="icon" href="th-favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=Fragment+Mono&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 40px 16px 64px; background: #fff; color: #141414; font: 15px/1.55 Outfit, sans-serif; }
+  .w { max-width: 1160px; margin: 0 auto; }
+  h1 { font: 800 2.4rem/1 Outfit; letter-spacing: -.05em; margin: 0 0 6px; }
+  h1 span { font-weight: 300; }
+  .sub { color: #616161; margin: 0 0 32px; }
+  h2 { font: 700 1.1rem/1 Outfit; letter-spacing: -.02em; margin: 40px 0 14px; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+  .c { border-radius: 24px; display: grid; place-items: center; min-height: 220px; padding: 32px; position: relative; }
+  .c small { position: absolute; left: 20px; bottom: 14px; font: 12px "Fragment Mono", monospace; opacity: .6; }
+  .c img.wm { width: min(420px, 90%); }
+  .hero { grid-column: 1 / -1; min-height: 300px; background: #f5f5f1; }
+  .hero img.wm { width: min(640px, 92%); }
+  .icons { display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap; justify-content: center; }
+  .spec { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .spec div { background: #f5f5f1; border-radius: 20px; padding: 22px; }
+  .spec b { display: block; font: 12px "Fragment Mono", monospace; color: #616161; margin-bottom: 10px; text-transform: uppercase; }
+  .sw { display: flex; gap: 10px; margin-top: 4px; }
+  .sw i { width: 44px; height: 44px; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  @media (max-width: 760px) { .grid, .spec { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="w">
+  <h1>trend<span>hijacking</span>.</h1>
+  <p class="sub">The final logo: "trend" in heavy, "hijacking" in light, finished with a square dot.</p>
+
+  <div class="grid">
+    <div class="c hero"><img class="wm" src="th-logo-light.svg" alt="TrendHijacking logo"><small>Primary · on light</small></div>
+    <div class="c" style="background:#141414;color:#fff"><img class="wm" src="th-logo-dark.svg" alt=""><small>On dark</small></div>
+    <div class="c" style="background:#1b7a43;color:#fff"><img class="wm" src="th-logo-dark.svg" alt=""><small>On brand green</small></div>
+    <div class="c" style="background:#b9f27c"><img class="wm" src="th-logo-black.svg" alt=""><small>One colour · black</small></div>
+    <div class="c" style="background:#0b0b0b;color:#fff"><img class="wm" src="th-logo-white.svg" alt=""><small>One colour · white</small></div>
+  </div>
+
+  <h2>App icon &amp; favicon</h2>
+  <div class="grid">
+    <div class="c" style="background:#f5f5f1"><div class="icons"><img src="th-icon.svg" width="120" alt="App icon"><img src="th-icon.svg" width="64" alt=""><img src="th-icon.svg" width="32" alt=""><img src="th-favicon.svg" width="16" alt=""></div><small>120 · 64 · 32 · 16 px</small></div>
+    <div class="c" style="background:#f5f5f1"><div class="icons"><img src="th-icon-dark.svg" width="120" alt="Dark app icon"><img src="th-icon-dark.svg" width="64" alt=""></div><small>Dark variant</small></div>
+  </div>
+
+  <h2>Specs</h2>
+  <div class="spec">
+    <div><b>Typeface</b>Outfit: ExtraBold 800 for "trend", Light 300 for "hijacking". Free for commercial use (SIL Open Font License). All logo files are outlined, so no font install is needed.</div>
+    <div><b>Colours</b><div class="sw"><i style="background:#1b7a43"></i><i style="background:#b9f27c"></i><i style="background:#141414"></i><i style="background:#f5f5f1"></i></div>Green #1b7a43 · Lime #b9f27c · Ink #141414 · Paper #f5f5f1</div>
+    <div><b>Clear space &amp; size</b>Keep at least the dot's width of clear space on every side. Minimum width is 110px on screen. Below that, use the app icon.</div>
+  </div>
+</div>
+</body>
+</html>
