@@ -406,103 +406,110 @@
     return;
   }
 
-  gsap.registerPlugin(ScrollTrigger);
   document.documentElement.classList.add("anim");
 
   addEventListener("scroll", () => onScroll(scrollY), { passive: true });
 
-  // appear effect: short rise + fade, soft deceleration (no overshoot, no blur — blur repaints stutter)
-  const APPEAR = { opacity: 1, y: 0, duration: 1.1, ease: "power3.out" };
+  // entrance animations wait for the intro screen (intro.js), or they would finish unseen behind it
+  const startMotion = () => {
+    gsap.registerPlugin(ScrollTrigger);
 
-  $$("[data-split], [data-reveal]").forEach((el) => {
-    gsap.to(el, {
-      ...APPEAR, delay: parseFloat(el.dataset.delay || 0),
-      scrollTrigger: { trigger: el, start: "top 90%", once: true },
-    });
-  });
+    // appear effect: short rise + fade, soft deceleration (no overshoot, no blur — blur repaints stutter)
+    const APPEAR = { opacity: 1, y: 0, duration: 1.1, ease: "power3.out" };
 
-  // stagger groups
-  $$("[data-stagger]").forEach((g) => {
-    const kids = [...g.children];
-    // CSS hover transitions on transform would fight GSAP's per-frame updates — pause them during the reveal
-    gsap.set(kids, { opacity: 0, y: 24, transition: "none" });
-    ScrollTrigger.batch(kids, {
-      start: "top 92%", once: true,
-      onEnter: (b) => gsap.to(b, { ...APPEAR, stagger: 0.1, onComplete: () => gsap.set(b, { clearProps: "all" }) }),
-    });
-  });
-
-  // image parallax inside squircle frames
-  $$("[data-parallax]").forEach((img) => {
-    gsap.fromTo(img, { yPercent: -8 }, {
-      yPercent: 8, ease: "none",
-      scrollTrigger: { trigger: img.closest(".media") || img, start: "top bottom", end: "bottom top", scrub: 1 },
-    });
-  });
-
-  // about page photo card: grows to full width as you scroll (runhappy-style)
-  const hero = $(".hero-media");
-  if (hero) {
-    // only the card's scale changes per frame (no inner parallax / backdrop blur) so it stays on the GPU
-    gsap.fromTo(hero, { scale: 0.9 }, {
-      scale: 1, ease: "none", force3D: true,
-      scrollTrigger: { trigger: ".hero-stage", start: "top 85%", end: "top 15%", scrub: 0.4 },
-    });
-  }
-
-  // homepage headline tiles settle in just after the headline
-  if ($(".hero-tile")) {
-    gsap.from(".hero-tile", { scale: 0.7, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, delay: 0.25 });
-  }
-
-  // pinned horizontal process (above phone width: phones swipe it as a normal rail, see the CSS)
-  const hs = $(".hscroll");
-  if (hs) {
-    gsap.matchMedia().add("(min-width: 761px)", () => {
-      const track = $(".hs-track", hs);
-      const dist = () => Math.max(0, track.scrollWidth - hs.clientWidth);
-      gsap.to(track, {
-        x: () => -dist(), ease: "none",
-        scrollTrigger: {
-          trigger: hs, start: "top top", end: () => "+=" + dist(),
-          pin: true, scrub: 1, invalidateOnRefresh: true,
-          onUpdate: (s) => { const p = $(".hs-progress i", hs); if (p) p.style.transform = `scaleX(${s.progress})`; },
-        },
+    $$("[data-split], [data-reveal]").forEach((el) => {
+      gsap.to(el, {
+        ...APPEAR, delay: parseFloat(el.dataset.delay || 0),
+        scrollTrigger: { trigger: el, start: "top 90%", once: true },
       });
     });
-  }
 
-  // fact cards: animate the small visuals in
-  $$("[data-dots]").forEach((g) => {
-    gsap.from(g.children, { scale: 0, duration: 0.5, ease: "power3.out", stagger: { each: 0.008, from: "start" }, scrollTrigger: { trigger: g, start: "top 90%", once: true } });
-  });
-  $$(".fact-years i").length && gsap.from(".fact-years i", { scaleY: 0, duration: 1, ease: "power3.out", stagger: 0.08, scrollTrigger: { trigger: ".fact-years", start: "top 90%", once: true } });
-  $$(".fact-seg i").length && gsap.from(".fact-seg i", { opacity: 0, y: 8, duration: 0.6, ease: "power3.out", stagger: 0.04, scrollTrigger: { trigger: ".fact-seg", start: "top 90%", once: true } });
-  $$(".fact-ring .arc").forEach((a) => gsap.from(a, { strokeDasharray: "0 100", duration: 1.6, ease: "power3.out", scrollTrigger: { trigger: a, start: "top 90%", once: true } }));
-
-  // counters
-  $$("[data-count]").forEach((el) => {
-    const end = parseFloat(el.dataset.count);
-    const dec = (el.dataset.count.split(".")[1] || "").length;
-    const o = { v: 0 };
-    gsap.to(o, {
-      v: end, duration: 2, ease: "power3.out",
-      scrollTrigger: { trigger: el, start: "top 90%", once: true },
-      onUpdate: () => (el.textContent = o.v.toFixed(dec)),
+    // stagger groups
+    $$("[data-stagger]").forEach((g) => {
+      const kids = [...g.children];
+      // CSS hover transitions on transform would fight GSAP's per-frame updates — pause them during the reveal
+      gsap.set(kids, { opacity: 0, y: 24, transition: "none" });
+      ScrollTrigger.batch(kids, {
+        start: "top 92%", once: true,
+        onEnter: (b) => gsap.to(b, { ...APPEAR, stagger: 0.1, onComplete: () => gsap.set(b, { clearProps: "all" }) }),
+      });
     });
-  });
 
-  // case cards: slight scale-in (same treatment as the hero: no inner parallax / backdrop blur, GPU scale)
-  $$(".case, .office").forEach((c) => {
-    gsap.fromTo(c, { scale: 0.94 }, { scale: 1, ease: "none", force3D: true, scrollTrigger: { trigger: c, start: "top bottom", end: "top 40%", scrub: 0.4 } });
-  });
+    // image parallax inside squircle frames
+    $$("[data-parallax]").forEach((img) => {
+      gsap.fromTo(img, { yPercent: -8 }, {
+        yPercent: 8, ease: "none",
+        scrollTrigger: { trigger: img.closest(".media") || img, start: "top bottom", end: "bottom top", scrub: 1 },
+      });
+    });
 
-  // flip cards: tap / Enter toggles (hover handles it on mouse devices)
-  $$(".flip").forEach((f) => {
-    const t = () => f.classList.toggle("on");
-    f.addEventListener("click", () => { if (!matchMedia("(hover: hover)").matches) t(); });
-    f.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t(); } });
-  });
+    // about page photo card: grows to full width as you scroll (runhappy-style)
+    const hero = $(".hero-media");
+    if (hero) {
+      // only the card's scale changes per frame (no inner parallax / backdrop blur) so it stays on the GPU
+      gsap.fromTo(hero, { scale: 0.9 }, {
+        scale: 1, ease: "none", force3D: true,
+        scrollTrigger: { trigger: ".hero-stage", start: "top 85%", end: "top 15%", scrub: 0.4 },
+      });
+    }
 
-  addEventListener("load", () => ScrollTrigger.refresh());
+    // homepage headline tiles settle in just after the headline
+    if ($(".hero-tile")) {
+      gsap.from(".hero-tile", { scale: 0.7, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, delay: 0.25 });
+    }
+
+    // pinned horizontal process (above phone width: phones swipe it as a normal rail, see the CSS)
+    const hs = $(".hscroll");
+    if (hs) {
+      gsap.matchMedia().add("(min-width: 761px)", () => {
+        const track = $(".hs-track", hs);
+        const dist = () => Math.max(0, track.scrollWidth - hs.clientWidth);
+        gsap.to(track, {
+          x: () => -dist(), ease: "none",
+          scrollTrigger: {
+            trigger: hs, start: "top top", end: () => "+=" + dist(),
+            pin: true, scrub: 1, invalidateOnRefresh: true,
+            onUpdate: (s) => { const p = $(".hs-progress i", hs); if (p) p.style.transform = `scaleX(${s.progress})`; },
+          },
+        });
+      });
+    }
+
+    // fact cards: animate the small visuals in
+    $$("[data-dots]").forEach((g) => {
+      gsap.from(g.children, { scale: 0, duration: 0.5, ease: "power3.out", stagger: { each: 0.008, from: "start" }, scrollTrigger: { trigger: g, start: "top 90%", once: true } });
+    });
+    $$(".fact-years i").length && gsap.from(".fact-years i", { scaleY: 0, duration: 1, ease: "power3.out", stagger: 0.08, scrollTrigger: { trigger: ".fact-years", start: "top 90%", once: true } });
+    $$(".fact-seg i").length && gsap.from(".fact-seg i", { opacity: 0, y: 8, duration: 0.6, ease: "power3.out", stagger: 0.04, scrollTrigger: { trigger: ".fact-seg", start: "top 90%", once: true } });
+    $$(".fact-ring .arc").forEach((a) => gsap.from(a, { strokeDasharray: "0 100", duration: 1.6, ease: "power3.out", scrollTrigger: { trigger: a, start: "top 90%", once: true } }));
+
+    // counters
+    $$("[data-count]").forEach((el) => {
+      const end = parseFloat(el.dataset.count);
+      const dec = (el.dataset.count.split(".")[1] || "").length;
+      const o = { v: 0 };
+      gsap.to(o, {
+        v: end, duration: 2, ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        onUpdate: () => (el.textContent = o.v.toFixed(dec)),
+      });
+    });
+
+    // case cards: slight scale-in (same treatment as the hero: no inner parallax / backdrop blur, GPU scale)
+    $$(".case, .office").forEach((c) => {
+      gsap.fromTo(c, { scale: 0.94 }, { scale: 1, ease: "none", force3D: true, scrollTrigger: { trigger: c, start: "top bottom", end: "top 40%", scrub: 0.4 } });
+    });
+
+    // flip cards: tap / Enter toggles (hover handles it on mouse devices)
+    $$(".flip").forEach((f) => {
+      const t = () => f.classList.toggle("on");
+      f.addEventListener("click", () => { if (!matchMedia("(hover: hover)").matches) t(); });
+      f.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t(); } });
+    });
+
+    if (document.readyState === "complete") ScrollTrigger.refresh();
+    else addEventListener("load", () => ScrollTrigger.refresh());
+  };
+  if (window.thIntroDone) window.thIntroDone.then(startMotion);
+  else startMotion();
 })();
