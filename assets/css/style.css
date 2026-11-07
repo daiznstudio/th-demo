@@ -34,13 +34,14 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-/* the root is footer-black so nothing white shows under the footer at the end of the page or in the
-   iOS toolbar area; the body's shadow keeps the overscroll above the page white */
+/* html AND body are footer-black: iOS Safari colours everything beyond the page (the area behind its toolbar,
+   overscroll) from the body's background, so a white body shows as white space under the footer.
+   The page itself is white via <main>; the body's shadow keeps the overscroll above the page white */
 html { background: var(--ink); -webkit-text-size-adjust: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--ink);
   color: var(--ink);
   font: 400 17px/1.6 var(--text);
   font-variation-settings: "opsz" 14;
@@ -89,6 +90,8 @@ ul, ol { list-style: none; }
 .mono { font-family: var(--mono); font-size: .8rem; letter-spacing: .01em; }
 
 /* ---------- layout ---------- */
+main { display: flow-root; background: var(--paper); }
+.foot-gap { padding-bottom: clamp(80px, 11vw, 150px); } /* pages whose last section sits clear of the footer */
 .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
 .sec { padding: clamp(80px, 11vw, 150px) 0; position: relative; }
 section[id] { scroll-margin-top: 100px; } /* anchor links land clear of the fixed nav */
@@ -700,7 +703,7 @@ section[id] { scroll-margin-top: 100px; } /* anchor links land clear of the fixe
 .cta-inner .lead { margin: 26px 0 36px; }
 
 /* ---------- footer ---------- */
-.foot { background: var(--ink); color: var(--paper); padding: clamp(64px, 8vw, 110px) 0 88px; margin-top: clamp(80px, 11vw, 150px); } /* bottom padding keeps the legal line clear of the WhatsApp button */
+.foot { background: var(--ink); color: var(--paper); padding: clamp(64px, 8vw, 110px) 0 88px; } /* bottom padding keeps the legal line clear of the WhatsApp button */
 .foot-blog { margin-bottom: clamp(48px, 6vw, 72px); padding-bottom: clamp(48px, 6vw, 72px); border-bottom: 1px solid var(--line-d); }
 .foot-blog .sec-head { margin-bottom: clamp(28px, 3.5vw, 40px); }
 .foot a.btn { color: var(--fg); }
@@ -1104,7 +1107,7 @@ tr:last-child td { border-bottom: 0; }
   .foot-top { grid-template-columns: 1fr; }
   .step { min-height: 360px; }
   .row2 { grid-template-columns: 1fr; }
-  .cta-box .media, .cta-coins { display: none; }
+  .cta-box .media { display: none; }
   .page-head, .art-head { padding-top: 120px; }
   .art-hero { aspect-ratio: 4 / 3; }
   .wa span { display: none; }
@@ -1114,22 +1117,23 @@ tr:last-child td { border-bottom: 0; }
 
 /* ---------- phones: the hero's deal boxes, above and below the copy ---------- */
 @media (max-width: 760px) {
-  /* the padding reserves the two bands, so the boxes can't collide with the copy however it wraps */
-  .hero { min-height: max(728px, 100svh); padding: 226px 0 176px; }
-  .hero-boxes { --u: clamp(.8px, .22vw, 1px); }
+  /* small boxes in the corners, so the copy keeps open space around it. The padding reserves their bands,
+     so they can't collide with the copy however it wraps */
+  .hero { min-height: max(660px, 100svh); padding: 178px 0 130px; }
+  .hero-boxes { --u: .66px; }
   .hbx { left: auto; top: auto; transform: rotate(var(--r)); }
-  .hbx:nth-child(1), .hbx:nth-child(4) { display: none; } /* P&L and letter of intent need more room */
-  .hbx:nth-child(2) { --w: 184; --r: -3deg; --dim: .92; left: -14px; top: 88px; }   /* monthly revenue */
-  .hbx:nth-child(3) { --w: 186; --r: 3deg; --dim: .8; right: -16px; top: 100px; }   /* listing */
-  .hbx:nth-child(5) { --w: 216; --r: -2deg; --dim: .95; left: -10px; bottom: 26px; } /* chat */
-  .hbx:nth-child(6) { --w: 176; --r: 4deg; --dim: .75; right: -26px; bottom: 26px; } /* store */
-  .hbx:nth-child(7) { --r: 3deg; --dim: 1; right: 12px; bottom: 116px; z-index: 1; } /* offer accepted */
+  .hbx:nth-child(1), .hbx:nth-child(4), .hbx:nth-child(6) { display: none; } /* P&L, letter of intent, store */
+  .hbx:nth-child(2) { --w: 176; --r: -3deg; --dim: .92; left: 14px; top: 86px; }   /* monthly revenue */
+  .hbx:nth-child(3) { --w: 178; --r: 3deg; --dim: .8; right: 14px; top: 94px; }    /* listing */
+  .hbx:nth-child(5) { --w: 200; --r: -2deg; --dim: .95; left: 14px; bottom: 26px; } /* chat */
+  .hbx:nth-child(7) { --r: 3deg; --dim: 1; right: 84px; bottom: 44px; }            /* offer accepted, clear of WhatsApp */
 }
 
 /* ---------- phones: shorter sections ---------- */
 @media (max-width: 760px) {
   .sec { padding-block: 56px; }
-  .foot { margin-top: 56px; padding-top: 48px; }
+  .foot-gap { padding-bottom: 56px; }
+  .foot { padding-top: 48px; }
   .d2 { font-size: 2rem; }
   .lead { font-size: 1rem; }
   .sec-head { margin-bottom: 20px; gap: 12px; }
@@ -1179,21 +1183,24 @@ tr:last-child td { border-bottom: 0; }
   [data-filter-grid] .price { margin: 0; font-size: 1.2rem; }
   [data-filter-grid] .go { width: 32px; height: 32px; }
 
-  /* track record: two by two */
-  .fact, .fact:nth-child(1), .fact:nth-child(4) { grid-column: span 6; min-height: 0; padding: 16px; gap: 10px; }
-  .fact-n { font-size: 2.6rem; }
-  .fact p { font-size: .82rem; line-height: 1.35; }
-  .fact-years { height: 40px; gap: 4px; }
+  /* track record: two by two, every card built the same: number, three-line text, then a visual on one shared baseline */
+  .facts { grid-auto-rows: 1fr; }
+  .fact, .fact:nth-child(1), .fact:nth-child(4) { grid-column: span 6; min-height: 0; padding: 16px; gap: 8px; }
+  .fact-n { font-size: 2.6rem; line-height: 1; }
+  .fact p { font-size: .8rem; line-height: 1.35; min-height: 4.05em; }
+  .fact-rate { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px; }
+  .fact-rate-txt { display: contents; }
+  .fact-years, .fact-dots, .fact-seg, .fact-ring { margin-top: auto; height: 38px; }
+  .fact-years { gap: 4px; }
   .fact-years i { border-radius: 4px; }
-  .fact-years b { display: none; }
-  .fact-dots { gap: 2.5px; }
-  .fact-key { display: none; }
-  .fact-seg { gap: 3px; }
-  .fact-seg i { height: 20px; border-radius: 5px; font-size: .5rem; }
-  .fact-rate { gap: 10px; }
-  .fact-ring { width: 84px; }
-  .fact-ring-in { gap: 1px; }
-  .fact-ring-in svg { width: 11px; }
+  .fact-years b, .fact-key { display: none; }
+  .fact-dots { max-width: none; gap: 2.5px; align-content: end; }
+  .fact-seg { gap: 3px; align-content: end; }
+  .fact-seg i { height: 17px; border-radius: 5px; font-size: .5rem; }
+  .fact-ring { display: flex; align-items: flex-end; align-self: stretch; width: auto; }
+  .fact-ring > svg { display: none; } /* a ring won't fit the shared band: just the stars */
+  .fact-ring-in { position: static; justify-content: flex-start; gap: 3px; }
+  .fact-ring-in svg { width: 20px; }
 
   /* three ways to work with us */
   .tier { padding: 20px; }
@@ -1226,8 +1233,16 @@ tr:last-child td { border-bottom: 0; }
   .quote { padding: 22px; gap: 18px; min-height: 210px; }
   .quote blockquote { font-size: 1.2rem; }
 
-  /* closing banners */
+  /* closing banners: the floating 3D art gets its own band above the copy */
   .cta-box { padding: 32px 22px; }
+  .cta-coins { position: relative; inset: auto; width: 100%; height: 170px; margin-bottom: 14px; }
+  .cc-stacks { width: 180px; right: 0; bottom: 0; }
+  .cc-hero { width: 96px; left: 3%; top: 10%; }
+  .cc-back { width: 44px; right: 8%; top: 0; }
+  .cc-front { width: 60px; left: 34%; bottom: -4%; }
+  .ct-link { width: 150px; right: auto; left: calc(50% - 75px); bottom: 2%; }
+  .ct-plus { width: 60px; left: 4%; top: 12%; }
+  .ct-star { width: 48px; right: 6%; top: 2%; }
   .cta-box .d1 { font-size: 2.4rem; }
   .cta-inner .lead { margin: 14px 0 22px; }
 
