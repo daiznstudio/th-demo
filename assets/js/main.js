@@ -46,7 +46,7 @@
     navEl.className = "nav";
     navEl.innerHTML = `
       <div class="nav-in">
-        <a class="logo" href="index.html" aria-label="TrendHijacking home">${LOGO}</a>
+        <a class="logo" href="index.html" aria-label="TrendHijacking home">${LOGO}<img class="lg-on-dark" src="assets/logo/th-logo-dark.svg" alt="" width="641" height="100"></a>
         <nav class="nav-links" aria-label="Main">
           ${LINKS.map(([k, h, t]) => k === "businesses"
             ? `<div class="drop"><button class="drop-btn ${page === k ? "active" : ""}" aria-expanded="false" aria-haspopup="true">${t}${CHEVRON}</button>${DROP}</div>`
@@ -75,13 +75,46 @@
     document.addEventListener("click", (e) => { if (!drop.contains(e.target)) setDrop(false); });
     drop.addEventListener("keydown", (e) => { if (e.key === "Escape") { setDrop(false); dropBtn.focus(); } });
     drop.addEventListener("mouseleave", () => setDrop(false));
+
+    // homepage: nav goes transparent with light text while it sits over the dark hero
+    const darkHero = $(".hero");
+    if (darkHero) {
+      navEl.classList.add("on-hero");
+      new IntersectionObserver(([e]) => {
+        navEl.classList.toggle("on-hero", e.isIntersecting);
+        darkHero.classList.toggle("is-away", !e.isIntersecting); // pauses the glow animation off screen
+      }, { rootMargin: "-60px 0px 0px 0px" }).observe(darkHero);
+    }
   }
 
   const footEl = $("#foot");
   if (footEl) {
     footEl.className = "foot";
+    // latest guides sit above the footer links; blog + article pages already list posts right above the footer
+    const FOOT_POSTS = [
+      ["Ge0IS98pJHqXAViJqm7sPVfGJs4.png", "Acquisition", "May 25, 2026", "The M&amp;A Minefield, How to Buy an Ecommerce Business Without Destroying Your Capital"],
+      ["lSisdz2W5gmqIFfuz3ScmOuK2U.png", "Acquisition", "May 22, 2026", "Web-Based Business for Sale: 5 Proven Sites Worth Buying Now"],
+      ["YNBfCivpO78PLjQhM9Qb1h8Rgc.png", "Investing", "May 21, 2026", "Buy vs. Build Ecommerce Business: Which Strategy Creates Faster Online Growth?"],
+    ];
+    const footBlog = page === "blog" ? "" : `
+        <div class="foot-blog on-dark">
+          <div class="sec-head">
+            <div class="stack-sm">
+              <span class="eyebrow">Insights</span>
+              <h2 class="d3">Our latest <em>guides.</em></h2>
+            </div>
+            <a class="btn btn-lime" href="blog.html">Browse the blog<span class="ic">${ARROW}</span></a>
+          </div>
+          <div class="posts">
+            ${FOOT_POSTS.map(([img, cat, date, title]) => `<a class="post" href="article.html">
+              <div class="media sq"><img src="https://framerusercontent.com/images/${img}?scale-down-to=1024" alt="" loading="lazy"></div>
+              <div class="post-meta"><span class="post-cat">${cat}</span><span>·</span><span>${date}</span></div>
+              <h3 class="post-t">${title}</h3>
+            </a>`).join("")}
+          </div>
+        </div>`;
     footEl.innerHTML = `
-      <div class="wrap">
+      <div class="wrap">${footBlog}
         <div class="foot-top">
           <div>
             <a class="logo" href="index.html">${LOGO_DARK}</a>
@@ -163,31 +196,184 @@
     $(".form-ok", form).style.display = "block";
     form.querySelector("button[type=submit]").disabled = true;
   });
+  // homepage off-market sentence arrives as contact.html?criteria=...
+  const criteria = new URLSearchParams(location.search).get("criteria");
+  if (form && criteria) $("#m", form).value = criteria;
+
+  /* ---------- homepage off-market: sentence pickers ---------- */
+  const omSentence = $("#om-sentence");
+  if (omSentence) {
+    const picks = $$(".om-pick", omSentence);
+    const cta = $("#om-cta");
+    const closePicks = (except) => picks.forEach((p) => {
+      if (p === except) return;
+      p.classList.remove("open");
+      p.firstElementChild.setAttribute("aria-expanded", "false");
+    });
+    picks.forEach((p) => {
+      const btn = p.firstElementChild;
+      const label = btn.firstElementChild;
+      const menu = $(".om-menu", p);
+      p.dataset.opts.split("|").forEach((opt) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.textContent = opt;
+        if (opt === label.textContent) item.setAttribute("aria-current", "true");
+        item.addEventListener("click", () => {
+          label.textContent = opt;
+          $$("button", menu).forEach((b) => b.removeAttribute("aria-current"));
+          item.setAttribute("aria-current", "true");
+          // the form only gets prefilled once the visitor has actually chosen something
+          const [niche, price, role] = picks.map((x) => x.firstElementChild.firstElementChild.textContent);
+          const text = `I'm looking for ${niche} priced at ${price}, and I want to be ${role}.`;
+          cta.href = `contact.html?criteria=${encodeURIComponent(text)}`;
+          closePicks();
+          btn.focus();
+        });
+        menu.append(item);
+      });
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closePicks(p);
+        btn.setAttribute("aria-expanded", p.classList.toggle("open"));
+        // keep the open menu inside the white card on narrow screens
+        menu.style.transform = "";
+        if (p.classList.contains("open")) {
+          const card = omSentence.parentElement.getBoundingClientRect();
+          const over = menu.getBoundingClientRect().right - (card.right - 8);
+          if (over > 0) menu.style.transform = `translateX(${-over}px)`;
+        }
+      });
+    });
+    document.addEventListener("click", () => closePicks());
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePicks(); });
+  }
+
+  /* ---------- services: tabs (pick a service, deal tracker) ---------- */
+  $$("[data-picker]").forEach((picker) => {
+    const tabs = $$('[role="tab"]', picker);
+    const panels = $$('[role="tabpanel"]', picker);
+    const select = (i) => {
+      tabs.forEach((t, n) => {
+        t.setAttribute("aria-selected", n === i);
+        t.tabIndex = n === i ? 0 : -1;
+        t.classList.toggle("done", n < i); // the tracker fills up to the current stage
+        t.classList.toggle("now", n === i);
+      });
+      panels.forEach((p, n) => p.classList.toggle("on", n === i));
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(i));
+      t.addEventListener("keydown", (e) => {
+        const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+        if (!step) return;
+        e.preventDefault();
+        const next = (i + step + tabs.length) % tabs.length;
+        select(next);
+        tabs[next].focus();
+      });
+    });
+    // homepage links like services.html#diligence open that service
+    const fromHash = () => {
+      const i = panels.findIndex((p) => `#${p.id}` === location.hash);
+      if (i < 0) return;
+      select(i);
+      picker.scrollIntoView();
+    };
+    fromHash();
+    addEventListener("hashchange", fromHash);
+    addEventListener("load", fromHash);
+
+    // deal tracker: walks through the stages by itself. The bar filling across the current stage IS the
+    // timer (see .auto in the CSS): when it finishes the next stage opens, and pausing it pauses everything.
+    if (!picker.hasAttribute("data-auto") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!panels.some((p) => `#${p.id}` === location.hash)) select(0);
+    picker.classList.add("auto");
+    const rail = tabs[0].parentElement;
+    const pausedBy = { offscreen: true, mouse: false, keyboard: false };
+    const pause = (why, on) => {
+      pausedBy[why] = on;
+      picker.classList.toggle("hold", Object.values(pausedBy).some(Boolean));
+    };
+    pause("offscreen", true);
+    new IntersectionObserver(([e]) => pause("offscreen", !e.isIntersecting), { threshold: 0.5 }).observe(picker);
+    // only the stage buttons pause it: the card is so wide that a resting mouse would stop it for good
+    rail.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") pause("mouse", true); });
+    rail.addEventListener("pointerleave", () => pause("mouse", false));
+    rail.addEventListener("focusin", (e) => { if (e.target.matches(":focus-visible")) pause("keyboard", true); });
+    rail.addEventListener("focusout", () => pause("keyboard", false));
+    picker.addEventListener("animationend", (e) => {
+      if (e.animationName !== "trk-fill") return;
+      picker.style.removeProperty("--dwell");
+      select((tabs.findIndex((t) => t.classList.contains("now")) + 1) % tabs.length);
+    });
+    // a stage the visitor chose stays up for longer before the tour carries on
+    tabs.forEach((t) => t.addEventListener("click", () => {
+      picker.style.setProperty("--dwell", "18s");
+      t.classList.remove("now");
+      void t.offsetWidth; // restart the bar, even when they clicked the stage already showing
+      t.classList.add("now");
+    }));
+  });
+
+  /* ---------- services: down payment slider ---------- */
+  $$("[data-upfront]").forEach((tool) => {
+    const input = $("input", tool);
+    const bar = $(".up-bar", tool);
+    const money = (v) => (v >= 1e6 ? `$${+(v / 1e6).toFixed(2)}M` : `$${Math.round(v / 1e3)}K`);
+    const render = () => {
+      const v = +input.value;
+      $('[data-up="price"]', tool).textContent = money(v);
+      $('[data-up="range"]', tool).textContent = `${money(v * 0.2)}–${money(v * 0.3)}`;
+      bar.style.width = `${(v / +input.max) * 100}%`; // the full track is the slider's maximum, so the bar is to scale
+    };
+    input.addEventListener("input", render);
+    render();
+  });
 
   /* ---------- article: progress + toc ---------- */
   const bar = $(".progress i");
   const tocLinks = $$(".toc a");
 
-  /* blog rail: prev/next scroll by one card */
-  $$("[data-rail]").forEach((rail) => {
-    const sec = rail.closest("section");
-    const prev = $("[data-rail-prev]", sec), next = $("[data-rail-next]", sec);
-    const step = () => (rail.children[0]?.offsetWidth || rail.clientWidth) + parseFloat(getComputedStyle(rail).columnGap || 0);
-    const sync = () => {
-      prev.disabled = rail.scrollLeft <= 2;
-      next.disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
-    };
-    prev.addEventListener("click", () => rail.scrollBy({ left: -step(), behavior: "smooth" }));
-    next.addEventListener("click", () => rail.scrollBy({ left: step(), behavior: "smooth" }));
-    rail.addEventListener("scroll", sync, { passive: true });
-    addEventListener("resize", sync);
-    sync();
-  });
-
   /* fact cards: 95% dot grid (100 dots) */
   $$("[data-dots]").forEach((g) => {
     const on = +g.dataset.dots;
     g.innerHTML = Array.from({ length: 100 }, (_, i) => `<i${i < on ? "" : ' class="off"'}></i>`).join("");
+  });
+
+  /* press strip: endless row that keeps moving, easing down to a slow drift on hover */
+  $$("[data-marquee]").forEach((m) => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const track = $(".press-track", m);
+    const set = document.createElement("div");
+    set.className = "press-set";
+    set.append(...track.children);
+    track.append(set);
+    const unit = [...set.children];
+    // repeat the outlets until one set is wider than the strip, then add a hidden twin for the seamless wrap
+    while (set.offsetWidth < m.offsetWidth * 1.2) unit.forEach((it) => set.append(it.cloneNode(true)));
+    const twin = set.cloneNode(true);
+    twin.setAttribute("aria-hidden", "true");
+    $$("a", twin).forEach((a) => (a.tabIndex = -1));
+    track.append(twin);
+
+    const BASE = 1.4, SLOW = 0.35; // px per frame at normal / hover speed
+    let x = 0, speed = BASE, target = BASE, visible = true;
+    m.addEventListener("pointerenter", () => (target = SLOW));
+    m.addEventListener("pointerleave", () => (target = BASE));
+    m.addEventListener("focusin", () => (target = SLOW));
+    m.addEventListener("focusout", () => (target = BASE));
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(m);
+    (function tick() {
+      if (visible) {
+        speed += (target - speed) * 0.05;
+        x -= speed;
+        const w = set.offsetWidth;
+        if (-x >= w) x += w;
+        track.style.transform = `translate3d(${x}px,0,0)`;
+      }
+      requestAnimationFrame(tick);
+    })();
   });
 
   /* ---------- motion ---------- */
@@ -249,7 +435,7 @@
     });
   });
 
-  // hero card: grows to full width as you scroll (runhappy-style)
+  // about page photo card: grows to full width as you scroll (runhappy-style)
   const hero = $(".hero-media");
   if (hero) {
     // only the card's scale changes per frame (no inner parallax / backdrop blur) so it stays on the GPU
@@ -257,7 +443,11 @@
       scale: 1, ease: "none", force3D: true,
       scrollTrigger: { trigger: ".hero-stage", start: "top 85%", end: "top 15%", scrub: 0.4 },
     });
-    gsap.from(".hero-chip", { y: 30, opacity: 0, duration: 1.2, ease: "expo.out", stagger: 0.15, delay: 0.6 });
+  }
+
+  // homepage headline tiles settle in just after the headline
+  if ($(".hero-tile")) {
+    gsap.from(".hero-tile", { scale: 0.7, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, delay: 0.25 });
   }
 
   // pinned horizontal process
@@ -298,6 +488,13 @@
   // case cards: slight scale-in (same treatment as the hero: no inner parallax / backdrop blur, GPU scale)
   $$(".case, .office").forEach((c) => {
     gsap.fromTo(c, { scale: 0.94 }, { scale: 1, ease: "none", force3D: true, scrollTrigger: { trigger: c, start: "top bottom", end: "top 40%", scrub: 0.4 } });
+  });
+
+  // flip cards: tap / Enter toggles (hover handles it on mouse devices)
+  $$(".flip").forEach((f) => {
+    const t = () => f.classList.toggle("on");
+    f.addEventListener("click", () => { if (!matchMedia("(hover: hover)").matches) t(); });
+    f.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t(); } });
   });
 
   addEventListener("load", () => ScrollTrigger.refresh());
