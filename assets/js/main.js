@@ -389,11 +389,7 @@
   const reduced =matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hasGsap = window.gsap && window.ScrollTrigger;
 
-  // nav hide-on-scroll
-  let lastY = 0;
   const onScroll = (y) => {
-    if (navEl && !navEl.classList.contains("open")) navEl.classList.toggle("hide", y > lastY && y > 300);
-    lastY = y;
     if (bar) {
       const max = document.documentElement.scrollHeight - innerHeight;
       bar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;

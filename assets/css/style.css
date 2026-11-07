@@ -158,9 +158,7 @@ section[id] { scroll-margin-top: 100px; } /* anchor links land clear of the fixe
 /* ---------- nav ---------- */
 .nav {
   position: fixed; inset: 14px 0 auto; z-index: 50; pointer-events: none;
-  transition: transform .5s var(--ease);
 }
-.nav.hide { transform: translateY(-120%); }
 .nav-in {
   pointer-events: auto;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -1239,13 +1237,17 @@ tr:last-child td { border-bottom: 0; }
   .cta-team { order: 0; margin: 0 0 14px; } /* About keeps its art above the copy */
   .cc-stacks { width: 180px; right: 0; bottom: 0; }
   .cc-hero { width: 96px; left: 3%; top: 10%; }
-  .cc-back { width: 44px; right: 8%; top: 0; }
+  .cc-back { width: 44px; right: auto; left: 44%; top: -42px; } /* tucked behind the button, in the gap left of the stack */
   .cc-front { width: 60px; left: 34%; bottom: -4%; }
   .ct-link { width: 150px; right: auto; left: calc(50% - 75px); bottom: 2%; }
   .ct-plus { width: 60px; left: 4%; top: 12%; }
   .ct-star { width: 48px; right: 6%; top: 2%; }
   .cta-box .d1 { font-size: 2.4rem; }
   .cta-inner .lead { margin: 14px 0 22px; }
+  /* homepage banner: centred copy; the ghost button is filled so the coin really sits behind it */
+  .cta-box:has(.cc-stacks) .cta-inner { text-align: center; }
+  .cta-box:has(.cc-stacks) .d1 { margin-inline: auto; }
+  .cta-box:has(.cc-stacks) .btn-ghost { background: var(--ink); }
 
   /* services: pick a service */
   .pick { margin-top: 24px; padding: 8px; gap: 8px; }
