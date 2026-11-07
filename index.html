@@ -135,8 +135,10 @@
   </section>
 
   <!-- ADVOCATE + HORIZONTAL PROCESS -->
+  <!-- the side gutter lives on this wrapper: ScrollTrigger miscounts margins on the element it pins, and that pushed the page wider than the screen -->
+  <div class="hs-outer">
   <section class="on-dark hscroll sq">
-    <div style="padding:clamp(80px,10vw,130px) 0 0">
+    <div class="hs-in">
       <div class="hs-track">
         <div class="step intro">
           <span class="eyebrow">Why TrendHijacking</span>
@@ -156,9 +158,9 @@
         <article class="step sq"><div class="step-viz" aria-hidden="true"><svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="1.5"><circle class="v-rip" cx="100" cy="80" r="22" style="--d:0s"/><circle class="v-rip" cx="100" cy="80" r="22" style="--d:1s"/><circle class="v-rip" cx="100" cy="80" r="22" style="--d:2s"/><circle cx="100" cy="80" r="22" fill="currentColor" stroke="none"/><path class="v-arrow" d="M91 89l18-18M96 71h13v13" stroke="#141414" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Exit</h3><p>We plan the exit from day one, so you sell at a stronger multiple.</p></div></article>
       </div>
       <div class="hs-progress"><i></i></div>
-      <div style="height:clamp(80px,10vw,130px)"></div>
     </div>
   </section>
+  </div>
 
   <!-- FACTS -->
   <section class="sec">

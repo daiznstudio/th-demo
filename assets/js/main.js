@@ -376,8 +376,17 @@
     })();
   });
 
+  /* process rail on phones: swiped natively, so the progress bar follows the swipe (desktop pins it below) */
+  $$(".hs-track").forEach((t) => {
+    const fill = $(".hs-progress i", t.parentElement);
+    t.addEventListener("scroll", () => {
+      const max = t.scrollWidth - t.clientWidth;
+      if (fill && max > 0) fill.style.transform = `scaleX(${t.scrollLeft / max})`;
+    }, { passive: true });
+  });
+
   /* ---------- motion ---------- */
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced =matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hasGsap = window.gsap && window.ScrollTrigger;
 
   // nav hide-on-scroll
@@ -450,18 +459,20 @@
     gsap.from(".hero-tile", { scale: 0.7, opacity: 0, duration: 0.8, ease: "power3.out", stagger: 0.08, delay: 0.25 });
   }
 
-  // pinned horizontal process
+  // pinned horizontal process (above phone width: phones swipe it as a normal rail, see the CSS)
   const hs = $(".hscroll");
   if (hs) {
-    const track = $(".hs-track", hs);
-    const dist = () => Math.max(0, track.scrollWidth - hs.clientWidth);
-    gsap.to(track, {
-      x: () => -dist(), ease: "none",
-      scrollTrigger: {
-        trigger: hs, start: "top top", end: () => "+=" + dist(),
-        pin: true, scrub: 1, invalidateOnRefresh: true,
-        onUpdate: (s) => { const p = $(".hs-progress i", hs); if (p) p.style.transform = `scaleX(${s.progress})`; },
-      },
+    gsap.matchMedia().add("(min-width: 761px)", () => {
+      const track = $(".hs-track", hs);
+      const dist = () => Math.max(0, track.scrollWidth - hs.clientWidth);
+      gsap.to(track, {
+        x: () => -dist(), ease: "none",
+        scrollTrigger: {
+          trigger: hs, start: "top top", end: () => "+=" + dist(),
+          pin: true, scrub: 1, invalidateOnRefresh: true,
+          onUpdate: (s) => { const p = $(".hs-progress i", hs); if (p) p.style.transform = `scaleX(${s.progress})`; },
+        },
+      });
     });
   }
 

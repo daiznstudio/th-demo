@@ -34,7 +34,9 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { background: var(--paper); -webkit-text-size-adjust: 100%; }
+/* the root is footer-black so nothing white shows under the footer at the end of the page or in the
+   iOS toolbar area; the body's shadow keeps the overscroll above the page white */
+html { background: var(--ink); -webkit-text-size-adjust: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
 
 body {
   margin: 0;
@@ -45,7 +47,8 @@ body {
   letter-spacing: -.011em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip; /* iOS can ignore hidden here; clip also leaves position: sticky working */
+  box-shadow: 0 -100vh 0 100vh var(--paper);
 }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
@@ -340,8 +343,8 @@ section[id] { scroll-margin-top: 100px; } /* anchor links land clear of the fixe
 .hbx-chat { border-radius: 1.3em 1.3em 1.3em .3em; corner-shape: round; }
 .hbx-who { display: flex; align-items: center; gap: .55em; margin-bottom: .55em; color: var(--hbx-mut); font-size: .88em; }
 .hbx-who i { display: grid; place-items: center; width: 1.9em; height: 1.9em; border-radius: 50%; background: var(--lime); color: #121412; font: 600 .78em var(--ui); }
-/* no room beside the headline on smaller screens */
-@media (max-width: 1360px) { .hero-boxes { display: none; } }
+/* no room beside the headline on mid-size screens; phones stack them above and below it instead */
+@media (min-width: 761px) and (max-width: 1360px) { .hero-boxes { display: none; } }
 
 /* inline icon tiles in the headline */
 .hero-tiles { display: inline-flex; vertical-align: -.1em; margin-right: .06em; }
@@ -407,7 +410,9 @@ section[id] { scroll-margin-top: 100px; } /* anchor links land clear of the fixe
 .listing:hover .go svg { transform: rotate(-45deg); }
 
 /* ---------- advocate / horizontal process ---------- */
-.hscroll { overflow: hidden; margin: 0 var(--pad); }
+.hs-outer { padding: 0 var(--pad); }
+.hscroll { overflow: hidden; }
+.hs-in { padding: clamp(80px, 10vw, 130px) 0; }
 .panel { padding: clamp(28px, 6vw, 88px); }
 .hs-track { display: flex; gap: 20px; padding: 0 var(--pad); width: max-content; }
 .step {
@@ -1105,6 +1110,213 @@ tr:last-child td { border-bottom: 0; }
   .wa span { display: none; }
   .wa { padding: 0 7px; }
   .sec-head { margin-bottom: 32px; }
+}
+
+/* ---------- phones: the hero's deal boxes, above and below the copy ---------- */
+@media (max-width: 760px) {
+  /* the padding reserves the two bands, so the boxes can't collide with the copy however it wraps */
+  .hero { min-height: max(728px, 100svh); padding: 226px 0 176px; }
+  .hero-boxes { --u: clamp(.8px, .22vw, 1px); }
+  .hbx { left: auto; top: auto; transform: rotate(var(--r)); }
+  .hbx:nth-child(1), .hbx:nth-child(4) { display: none; } /* P&L and letter of intent need more room */
+  .hbx:nth-child(2) { --w: 184; --r: -3deg; --dim: .92; left: -14px; top: 88px; }   /* monthly revenue */
+  .hbx:nth-child(3) { --w: 186; --r: 3deg; --dim: .8; right: -16px; top: 100px; }   /* listing */
+  .hbx:nth-child(5) { --w: 216; --r: -2deg; --dim: .95; left: -10px; bottom: 26px; } /* chat */
+  .hbx:nth-child(6) { --w: 176; --r: 4deg; --dim: .75; right: -26px; bottom: 26px; } /* store */
+  .hbx:nth-child(7) { --r: 3deg; --dim: 1; right: 12px; bottom: 116px; z-index: 1; } /* offer accepted */
+}
+
+/* ---------- phones: shorter sections ---------- */
+@media (max-width: 760px) {
+  .sec { padding-block: 56px; }
+  .foot { margin-top: 56px; padding-top: 48px; }
+  .d2 { font-size: 2rem; }
+  .lead { font-size: 1rem; }
+  .sec-head { margin-bottom: 20px; gap: 12px; }
+  .sec-head .lead { display: none; }
+  .page-head { padding: 104px 0 32px; }
+  .page-head .d1 { font-size: 2.5rem; }
+  .page-head .lead { margin-top: 14px; }
+  .page-head-row { gap: 0; }
+
+  /* card groups: one row you swipe, with the next card peeking in, instead of a tall stack */
+  .listings:not([data-filter-grid]), .tiers, .cases, .quotes, .flips, .offices, .hs-track {
+    display: flex; gap: 12px; margin-inline: calc(-1 * var(--pad)); padding-inline: var(--pad);
+    scroll-padding-inline: var(--pad); scroll-snap-type: x mandatory; overflow-x: auto;
+    overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .listings:not([data-filter-grid])::-webkit-scrollbar, .tiers::-webkit-scrollbar, .cases::-webkit-scrollbar, .quotes::-webkit-scrollbar, .flips::-webkit-scrollbar, .offices::-webkit-scrollbar, .hs-track::-webkit-scrollbar { display: none; }
+  .listings:not([data-filter-grid]) > *, .tiers > *, .cases > *, .quotes > *, .flips > *, .offices > *, .hs-track > * { flex: 0 0 84%; min-width: 0; scroll-snap-align: start; }
+  .listing:hover { transform: none; box-shadow: none; }
+
+  /* homepage process: a swipe rail instead of a pinned scroll */
+  .hs-in { padding: 28px 0 24px; }
+  .hs-track { margin-inline: 0; width: auto; padding-inline: 20px; scroll-padding-inline: 20px; }
+  .step { width: auto; min-height: 330px; padding: 20px; }
+  .step.intro { width: auto; min-height: 0; padding: 0; justify-content: flex-start; gap: 0; }
+  .step.intro .d2 { margin: 16px 0 12px !important; }
+  .step.intro .btns { margin-top: 20px !important; }
+  .step h3 { font-size: 2rem; margin-bottom: 8px; }
+  .step-viz { padding-bottom: 12px; }
+  .step-viz svg { max-width: 170px; }
+  .hs-progress { margin: 20px 20px 0; }
+
+  /* listings */
+  .listings:not([data-filter-grid]) .media { aspect-ratio: 16 / 10; }
+  .listing-title { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* businesses page: a catalogue, so compact rows rather than a rail */
+  [data-filter-grid].listings { gap: 10px; }
+  [data-filter-grid] .listing { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 12px; padding: 8px; }
+  [data-filter-grid] .listing .media { aspect-ratio: auto; }
+  [data-filter-grid] .listing .media img { position: absolute; inset: 0; } /* the photo fills the row and never sets its height */
+  [data-filter-grid] .listing-body { padding: 6px 6px 4px 0; gap: 8px; }
+  [data-filter-grid] .listing-meta { font-size: .64rem; }
+  [data-filter-grid] .listing-meta .pill { display: none; }
+  [data-filter-grid] .listing-title { font-size: .95rem; }
+  [data-filter-grid] .listing-foot { align-items: center; padding-top: 8px; }
+  [data-filter-grid] .price-l { display: none; }
+  [data-filter-grid] .price { margin: 0; font-size: 1.2rem; }
+  [data-filter-grid] .go { width: 32px; height: 32px; }
+
+  /* track record: two by two */
+  .fact, .fact:nth-child(1), .fact:nth-child(4) { grid-column: span 6; min-height: 0; padding: 16px; gap: 10px; }
+  .fact-n { font-size: 2.6rem; }
+  .fact p { font-size: .82rem; line-height: 1.35; }
+  .fact-years { height: 40px; gap: 4px; }
+  .fact-years i { border-radius: 4px; }
+  .fact-years b { display: none; }
+  .fact-dots { gap: 2.5px; }
+  .fact-key { display: none; }
+  .fact-seg { gap: 3px; }
+  .fact-seg i { height: 20px; border-radius: 5px; font-size: .5rem; }
+  .fact-rate { gap: 10px; }
+  .fact-ring { width: 84px; }
+  .fact-ring-in { gap: 1px; }
+  .fact-ring-in svg { width: 11px; }
+
+  /* three ways to work with us */
+  .tier { padding: 20px; }
+  .tier-top { margin-bottom: 18px; }
+  .tier > p { display: none; }
+  .tier ul { margin: 14px 0 18px; gap: 8px; }
+  .tier li { font-size: .9rem; gap: 8px; }
+
+  /* case studies + offices */
+  .case { min-height: 400px; padding: 18px; }
+  .case-t { font-size: 1.35rem; margin: 8px 0 12px; }
+  .case-nums div { padding: 10px 12px; }
+  .case-nums b { margin-top: 5px; }
+  .office { min-height: 240px; padding: 20px; }
+
+  /* financing card: most of the photo stays visible above the copy */
+  .finance-photo { min-height: 0; }
+  .fp-copy { padding: 120px 20px 20px; }
+  .fp-row { padding-top: 12px; gap: 14px; }
+
+  /* off-market: heading, the sentence, the button */
+  .om { padding: 20px; overflow: visible; } /* the pickers' menus may hang past the card's edge */
+  .om-head .lead, .om-step, .om-foot ul { display: none; }
+  .om-head .d3 { margin-top: 12px; }
+  .om-form { margin: 16px 0; padding: 18px; border-radius: 20px; }
+  .om-s { font-size: 1.4rem; line-height: 1.5; letter-spacing: -.035em; }
+  .om-foot .btn { flex: 1 1 auto; justify-content: space-between; }
+
+  /* testimonials */
+  .quote { padding: 22px; gap: 18px; min-height: 210px; }
+  .quote blockquote { font-size: 1.2rem; }
+
+  /* closing banners */
+  .cta-box { padding: 32px 22px; }
+  .cta-box .d1 { font-size: 2.4rem; }
+  .cta-inner .lead { margin: 14px 0 22px; }
+
+  /* services: pick a service */
+  .pick { margin-top: 24px; padding: 8px; gap: 8px; }
+  .pick-tabs { gap: 4px; }
+  .pick-tab { gap: 5px; padding: 12px 14px; border-radius: 18px; }
+  .pick-tab span { font-size: .76rem; }
+  .pick-tab b { font-size: 1.15rem; }
+  .pick-body { padding: 16px; border-radius: 18px; }
+  .pick-lead { font-size: 1rem; }
+  .pick-facts { flex-wrap: nowrap; gap: 24px; margin: 14px 0 16px; padding: 12px 0; }
+  .pick-facts span { font-size: .78rem; }
+  .pick-facts b { margin-top: 5px; font-size: 1.3rem; white-space: nowrap; }
+  .pick-list { display: none; }
+
+  /* services: the two sides face each other, row by row, like a table */
+  .sides { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(6, auto); gap: 0 8px; }
+  .side { grid-row: span 6; display: grid; grid-template-rows: subgrid; padding: 14px 12px; }
+  .side > span { font-size: .72rem; }
+  .side > h3 { margin: 6px 0 12px; font-size: 1.12rem; letter-spacing: -.03em; }
+  .side-row { padding: 9px 0; }
+  .side-row small { font-size: .7rem; }
+  .side-row p { margin-top: 4px; font: 450 .86rem/1.25 var(--ui); letter-spacing: -.01em; }
+  .sides-foot { margin-top: 16px; gap: 12px; }
+
+  /* services: financing */
+  .up-photo .lead { display: none; }
+  .up-photo .fp-copy { padding: 90px 20px 20px; }
+  .up-photo .btn { margin-top: 16px; }
+  .up-tool { padding: 18px; }
+  .up-tool input[type="range"] { margin: 6px 0 12px; }
+  .up-out { padding: 14px; border-radius: 18px; }
+  .up-money { font-size: 2rem; margin-top: 4px; }
+  .up-track { height: 28px; margin: 12px 0 10px; }
+  .up-key { font-size: .8rem; gap: 6px; }
+  .up-note { margin-top: 10px; font-size: .76rem; }
+
+  /* services: deal tracker */
+  .trk-card { margin-top: 12px; padding: 8px; }
+  .trk-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .trk-main { padding: 16px 18px; border-radius: 18px; }
+  .trk-main small { font-size: .8rem; }
+  .trk-main h3 { margin-top: 6px; font-size: 1.9rem; }
+  .trk-cell { padding: 14px; border-radius: 18px; }
+  .trk-cell small { font-size: .78rem; }
+  .trk-cell p { margin-top: 8px; font: 450 .92rem/1.25 var(--ui); letter-spacing: -.01em; }
+
+  /* about */
+  .hero-media { height: 300px; }
+  .story { padding: 22px; }
+  .story-copy p:not(.lead) { display: none; }
+  .story-stats { margin-top: 22px; }
+  .story-stat { padding-top: 16px; }
+  .flip { height: 210px; }
+
+  /* blog: compact rows */
+  .post-feat { gap: 14px; margin-bottom: 36px; }
+  .post-feat .post-t { font-size: 1.5rem; }
+  .post-feat .post-x { display: none; }
+  .bgrid { gap: 10px; }
+  .bcard { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 12px; padding: 8px; }
+  .bcard-img { align-self: center; } /* keeps its 16:9, so the title in the artwork isn't cropped */
+  .bcard-body { padding: 4px 6px 4px 0; gap: 8px; }
+  .bcard-meta { justify-content: flex-start; font-size: .62rem; }
+  .bcard-cat { padding: 4px 8px; }
+  .bcard-t { min-height: 0; font-size: .98rem; -webkit-line-clamp: 3; }
+  .bcard-x, .bcard-go { display: none; }
+
+  .finance .media { min-height: 170px; }
+  .finance-copy { gap: 20px; padding: 22px; }
+
+  /* contact */
+  .cinfo { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 20px; }
+  .cinfo a, .cinfo div { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 14px; }
+  .cinfo > :first-child, .cinfo > :last-child { grid-column: 1 / -1; }
+  .cinfo b { font-size: .95rem; text-align: left !important; }
+
+  /* footer */
+  .foot-blog { margin-bottom: 32px; padding-bottom: 32px; }
+  .foot-blog .post-meta { flex-wrap: wrap; white-space: normal; row-gap: 4px; }
+  .foot-blog .post-t { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .foot-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; padding-bottom: 28px; }
+  .foot-top > :first-child, .foot-top > :last-child { grid-column: 1 / -1; }
+  .foot-addr:first-of-type { display: none; }
+  .foot-addr + .foot-addr { margin-top: 0; }
+  .foot .logo { margin-bottom: 14px; }
+  .foot h4 { margin-bottom: 12px; }
+  .foot li { font-size: .92rem; line-height: 1.35; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
